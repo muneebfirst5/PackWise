@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PackWise - Saved Trips</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #1f2937;
+        }
+
+        header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 18px 20px;
+        }
+
+        .nav {
+            max-width: 1000px;
+            margin: auto;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            color: #2563eb;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .home-btn {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .page-heading {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-heading h1 {
+            margin-bottom: 10px;
+        }
+
+        .page-heading p {
+            color: #6b7280;
+        }
+
+        .trips-container {
+            display: grid;
+            gap: 18px;
+        }
+
+        .trip-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 22px;
+
+            box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+        }
+
+        .trip-card h2 {
+            margin: 0 0 12px;
+            color: #2563eb;
+        }
+
+        .trip-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .info {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .info strong {
+            display: block;
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            padding: 11px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .load-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+            color: white;
+        }
+
+        .new-btn {
+            display: inline-block;
+            margin-top: 25px;
+            background: #16a34a;
+            color: white;
+            text-decoration: none;
+            padding: 13px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .empty {
+            background: white;
+            border: 1px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                margin: 20px auto;
+                padding: 15px;
+            }
+
+            .trip-info {
+                grid-template-columns: 1fr;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .buttons button {
+                width: 100%;
+            }
+
+            .new-btn {
+                display: block;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="nav">
+
+        <a href="index.html" class="logo">
+            PackWise
+        </a>
+
+        <a href="index.html" class="home-btn">
+            ← Home
+        </a>
+
+    </div>
+
+</header>
+
+
+<div class="container">
+
+    <div class="page-heading">
+
+        <h1>Saved Trips</h1>
+
+        <p>
+            View and manage your saved packing trips.
+        </p>
+
+    </div>
+
+
+    <div
+        id="tripsContainer"
+        class="trips-container"
+    ></div>
+
+
+    <div style="text-align:center;">
+
+        <a
+            href="generator.html"
+            class="new-btn"
+        >
+            + Create New Trip
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function getSavedTrips() {
+
+    const saved =
+        localStorage.getItem("packwiseTrips");
+
+    if (!saved) {
+        return [];
+    }
+
+    try {
+        return JSON.parse(saved);
+    } catch (error) {
+        return [];
+    }
+}
+
+
+function saveTrips(trips) {
+
+    localStorage.setItem(
+        "packwiseTrips",
+        JSON.stringify(trips)
+    );
+}
+
+
+function displayTrips() {
+
+    const container =
+        document.getElementById(
+            "tripsContainer"
+        );
+
+    const trips = getSavedTrips();
+
+    container.innerHTML = "";
+
+
+    if (trips.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty">
+
+                <h2>No saved trips yet</h2>
+
+                <p>
+                    Create a packing list and save it
+                    to see your trip here.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    trips.forEach(
+        (trip, index) => {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "trip-card";
+
+
+            const destination =
+                trip.destination ||
+                "Unnamed Trip";
+
+            const days =
+                trip.days ||
+                "Not specified";
+
+            const travelers =
+                trip.travelers ||
+                "Not specified";
+
+            const tripType =
+                trip.tripType ||
+                "Not specified";
+
+            const weather =
+                trip.weather ||
+                "Not specified";
+
+
+            card.innerHTML = `
+
+                <h2>
+                    ${destination}
+                </h2>
+
+                <div class="trip-info">
+
+                    <div class="info">
+                        <strong>Days</strong>
+                        ${days}
+                    </div>
+
+                    <div class="info">
+                        <strong>Travelers</strong>
+                        ${travelers}
+                    </div>
+
+                    <div class="info">
+                        <strong>Trip Type</strong>
+                        ${tripType}
+                    </div>
+
+                    <div class="info">
+                        <strong>Weather</strong>
+                        ${weather}
+                    </div>
+
+                </div>
+
+                <div class="buttons">
+
+                    <button
+                        class="load-btn"
+                        onclick="loadTrip(${index})"
+                    >
+                        Load Trip
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteTrip(${index})"
+                    >
+                        Delete
+                    </button>
+
+                </div>
+            `;
+
+
+            container.appendChild(card);
+
+        }
+    );
+}
+
+
+function loadTrip(index) {
+
+    const trips =
+        getSavedTrips();
+
+    const trip =
+        trips[index];
+
+    if (!trip) {
+
+        alert("Saved trip not found.");
+
+        return;
+    }
+
+
+    localStorage.setItem(
+        "packwiseSelectedTrip",
+        JSON.stringify(trip)
+    );
+
+
+    window.location.href =
+        "generator.html";
+}
+
+
+function deleteTrip(index) {
+
+    const trips =
+        getSavedTrips();
+
+
+    if (!trips[index]) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            "Delete this saved trip?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    trips.splice(index, 1);
+
+    saveTrips(trips);
+
+    displayTrips();
+}
+
+
+displayTrips();
+
+</script>
+
+</body>
+</html>
