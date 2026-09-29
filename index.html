@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PackWise - Smart Travel Packing Assistant</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #1f2937;
+        }
+
+        /* HEADER */
+
+        header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            max-width: 1100px;
+            margin: auto;
+            padding: 16px 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 22px;
+        }
+
+        .nav-links a {
+            color: #374151;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        .nav-button {
+            background: #2563eb;
+            color: white !important;
+            padding: 10px 16px;
+            border-radius: 8px;
+        }
+
+        /* HERO */
+
+        .hero {
+            background:
+                linear-gradient(
+                    135deg,
+                    #eff6ff,
+                    #ffffff
+                );
+
+            padding: 85px 20px;
+        }
+
+        .hero-content {
+            max-width: 1100px;
+            margin: auto;
+
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            line-height: 1.1;
+            margin: 0 0 20px;
+            color: #111827;
+        }
+
+        .hero h1 span {
+            color: #2563eb;
+        }
+
+        .hero p {
+            font-size: 19px;
+            line-height: 1.7;
+            color: #6b7280;
+            max-width: 600px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+
+        .primary-button,
+        .secondary-button {
+            display: inline-block;
+            padding: 14px 22px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .primary-button {
+            background: #2563eb;
+            color: white;
+        }
+
+        .primary-button:hover {
+            background: #1d4ed8;
+        }
+
+        .secondary-button {
+            background: white;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* HERO CARD */
+
+        .hero-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.12);
+            border: 1px solid #e5e7eb;
+        }
+
+        .hero-card-top {
+            background: #eff6ff;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+        }
+
+        .hero-card-top strong {
+            color: #2563eb;
+            font-size: 18px;
+        }
+
+        .mock-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mock-item:last-child {
+            border-bottom: none;
+        }
+
+        .check {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        /* GENERAL */
+
+        section {
+            padding: 75px 20px;
+        }
+
+        .section-container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .section-heading {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 45px;
+        }
+
+        .section-heading h2 {
+            font-size: 34px;
+            margin: 0 0 12px;
+        }
+
+        .section-heading p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* FEATURES */
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.04);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 23px;
+            margin-bottom: 18px;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 10px;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* HOW IT WORKS */
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .step {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .step-number {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin: 0 auto 15px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .step p {
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        /* TRIP TYPES */
+
+        .trip-types {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .trip-card {
+            background: white;
+            padding: 22px 12px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .trip-card .emoji {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .trip-card strong {
+            display: block;
+        }
+
+        /* CTA */
+
+        .cta {
+            background: #2563eb;
+            color: white;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 34px;
+            margin-top: 0;
+        }
+
+        .cta p {
+            max-width: 650px;
+            margin: 0 auto 25px;
+            line-height: 1.6;
+            color: #dbeafe;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #2563eb;
+            padding: 14px 24px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #111827;
+            color: white;
+            padding: 30px 20px;
+        }
+
+        .footer-content {
+            max-width: 1100px;
+            margin: auto;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        footer p {
+            margin: 0;
+            color: #9ca3af;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 800px) {
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 55px 20px;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .trip-types {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 450px) {
+
+            .hero h1 {
+                font-size: 34px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .primary-button,
+            .secondary-button {
+                text-align: center;
+                width: 100%;
+            }
+
+            .trip-types {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<header>
+
+    <nav class="nav">
+
+        <a href="index.html" class="logo">
+            PackWise
+        </a>
+
+        <div class="nav-links">
+
+            <a href="#features">
+                Features
+            </a>
+
+            <a href="#how">
+                How It Works
+            </a>
+
+            <a href="#trips">
+                Trip Types
+            </a>
+
+            <a
+                href="generator.html"
+                class="nav-button"
+            >
+                Create List
+            </a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div>
+
+            <h1>
+                Pack smarter.<br>
+                Travel with <span>confidence.</span>
+            </h1>
+
+            <p>
+                PackWise helps you create a personalized
+                travel packing list based on your destination,
+                trip duration, travelers, trip type and weather.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a
+                    href="generator.html"
+                    class="primary-button"
+                >
+                    Create My Packing List
+                </a>
+
+                <a
+                    href="#how"
+                    class="secondary-button"
+                >
+                    How It Works
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- PREVIEW CARD -->
+
+        <div class="hero-card">
+
+            <div class="hero-card-top">
+
+                <strong>
+                    ✈️ Dubai — 5 Days
+                </strong>
+
+                <br>
+
+                <small>
+                    International Trip
+                </small>
+
+            </div>
+
+            <div class="mock-item">
+                <span>T-shirts: 5</span>
+                <span class="check">✓</span>
+            </div>
+
+            <div class="mock-item">
+                <span>Underwear: 6</span>
+                <span class="check">✓</span>
+            </div>
+
+            <div class="mock-item">
+                <span>Passport</span>
+                <span class="check">✓</span>
+            </div>
+
+            <div class="mock-item">
+                <span>Phone & Charger</span>
+                <span class="check">✓</span>
+            </div>
+
+            <div class="mock-item">
+                <span>Sunscreen</span>
+                <span>○</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FEATURES -->
+
+<section id="features">
+
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <h2>
+                Everything you need to pack better
+            </h2>
+
+            <p>
+                PackWise turns your trip details into a
+                practical checklist so you can focus on
+                your journey instead of remembering every item.
+            </p>
+
+        </div>
+
+
+        <div class="features">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📋
+                </div>
+
+                <h3>
+                    Personalized Lists
+                </h3>
+
+                <p>
+                    Get a packing list based on your
+                    destination, duration, travelers and
+                    type of trip.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🌤
+                </div>
+
+                <h3>
+                    Weather-Aware
+                </h3>
+
+                <p>
+                    Select expected weather and PackWise
+                    adds useful clothing and protection
+                    suggestions.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    💾
+                </div>
+
+                <h3>
+                    Save Your Trips
+                </h3>
+
+                <p>
+                    Save packing lists in your browser and
+                    load them again whenever you need them.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    ☑
+                </div>
+
+                <h3>
+                    Packing Counter
+                </h3>
+
+                <p>
+                    Check items as you pack and instantly
+                    see how many items are completed.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🖨
+                </div>
+
+                <h3>
+                    Print Your List
+                </h3>
+
+                <p>
+                    Need a physical checklist? Print your
+                    generated packing list directly.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📱
+                </div>
+
+                <h3>
+                    Mobile Friendly
+                </h3>
+
+                <p>
+                    Use PackWise comfortably on phones,
+                    tablets and desktop screens.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- HOW IT WORKS -->
+
+<section id="how">
+
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <h2>
+                How PackWise works
+            </h2>
+
+            <p>
+                Create your packing list in just a few simple steps.
+            </p>
+
+        </div>
+
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="step-number">
+                    1
+                </div>
+
+                <h3>
+                    Enter Trip Details
+                </h3>
+
+                <p>
+                    Tell PackWise where you're going,
+                    how long you're staying and how many
+                    people are travelling.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    2
+                </div>
+
+                <h3>
+                    Generate Your List
+                </h3>
+
+                <p>
+                    PackWise organizes useful items into
+                    clothing, toiletries, electronics,
+                    documents and essentials.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    3
+                </div>
+
+                <h3>
+                    Pack & Check
+                </h3>
+
+                <p>
+                    Tick items as you pack, save your trip
+                    or print the list for later.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- TRIP TYPES -->
+
+<section id="trips">
+
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <h2>
+                Built for different kinds of trips
+            </h2>
+
+            <p>
+                Choose a trip type and PackWise will
+                include relevant items.
+            </p>
+
+        </div>
+
+
+        <div class="trip-types">
+
+            <div class="trip-card">
+
+                <div class="emoji">
+                    🏖
+                </div>
+
+                <strong>
+                    Beach
+                </strong>
+
+            </div>
+
+
+            <div class="trip-card">
+
+                <div class="emoji">
+                    🥾
+                </div>
+
+                <strong>
+                    Hiking
+                </strong>
+
+            </div>
+
+
+            <div class="trip-card">
+
+                <div class="emoji">
+                    ✈️
+                </div>
+
+                <strong>
+                    International
+                </strong>
+
+            </div>
+
+
+            <div class="trip-card">
+
+                <div class="emoji">
+                    🏙
+                </div>
+
+                <strong>
+                    City
+                </strong>
+
+            </div>
+
+
+            <div class="trip-card">
+
+                <div class="emoji">
+                    💼
+                </div>
+
+                <strong>
+                    Business
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CTA -->
+
+<section class="cta">
+
+    <div class="section-container">
+
+        <h2>
+            Ready to pack smarter?
+        </h2>
+
+        <p>
+            Create your personalized packing list and
+            make your next trip easier to prepare for.
+        </p>
+
+        <a
+            href="generator.html"
+            class="cta-button"
+        >
+            Create My Packing List
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    <div class="footer-content">
+
+        <strong>
+            PackWise
+        </strong>
+
+        <p>
+            Smart packing for smarter travel.
+        </p>
+
+        <p>
+            © 2026 PackWise
+        </p>
+
+    </div>
+
+</footer>
+
+
+</body>
+</html>

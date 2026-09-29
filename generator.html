@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PackWise - Smart Packing Generator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #1f2937;
+}
+
+header {
+    background: white;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+header h1 {
+    margin: 0;
+    color: #2563eb;
+}
+
+header p {
+    margin-bottom: 0;
+    color: #666;
+}
+
+.container {
+    max-width: 950px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.box {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+button {
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.generate-btn {
+    width: 100%;
+    margin-top: 22px;
+    background: #2563eb;
+    color: white;
+}
+
+.generate-btn:hover {
+    background: #1d4ed8;
+}
+
+#result {
+    display: none;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.summary-card {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.summary-card small {
+    display: block;
+    color: #6b7280;
+    margin-bottom: 5px;
+}
+
+.summary-card strong {
+    color: #1d4ed8;
+}
+
+.counter {
+    display: inline-block;
+    background: #e8f0ff;
+    color: #2563eb;
+    padding: 9px 14px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.weather-box,
+.reminder-box {
+    margin-top: 15px;
+    padding: 18px;
+    border-radius: 12px;
+}
+
+.weather-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+
+.reminder-box {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+}
+
+.weather-box h3,
+.reminder-box h3 {
+    margin-top: 0;
+}
+
+.category {
+    margin-top: 25px;
+}
+
+.category h3 {
+    color: #2563eb;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 8px;
+}
+
+.packing-list {
+    list-style: none;
+    padding: 0;
+}
+
+.packing-list li {
+    background: #f8fafc;
+    margin-bottom: 8px;
+    padding: 13px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.packing-list label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.packing-list input[type="checkbox"] {
+    width: auto;
+    transform: scale(1.2);
+}
+
+.packing-list input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: #777;
+}
+
+.essential {
+    border-left: 4px solid #f59e0b !important;
+}
+
+.essential-badge {
+    color: #b45309;
+    font-size: 11px;
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.action-buttons button {
+    flex: 1;
+    min-width: 150px;
+}
+
+.print-btn {
+    background: #16a34a;
+    color: white;
+}
+
+.save-btn {
+    background: #7c3aed;
+    color: white;
+}
+
+.load-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.clear-btn {
+    background: #dc2626;
+    color: white;
+}
+
+.saved-message {
+    display: none;
+    margin-top: 12px;
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.saved-trips {
+    margin-top: 25px;
+}
+
+.saved-trip {
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.saved-trip-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.saved-trip h4 {
+    margin: 0;
+}
+
+.saved-trip p {
+    color: #6b7280;
+    margin: 8px 0;
+}
+
+.saved-trip button {
+    margin-right: 5px;
+    margin-top: 5px;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.load-small {
+    background: #2563eb;
+    color: white;
+}
+
+.delete-small {
+    background: #dc2626;
+    color: white;
+}
+
+.no-saved {
+    color: #777;
+}
+
+@media (max-width: 700px) {
+    .container {
+        padding: 15px;
+    }
+
+    .box {
+        padding: 18px;
+    }
+
+    .summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 450px) {
+    .summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    header,
+    .back-link,
+    .form-box,
+    .action-buttons,
+    .saved-trips,
+    .counter {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .container {
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .box {
+        box-shadow: none;
+        padding: 0;
+    }
+
+    #result {
+        display: block !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>PackWise</h1>
+    <p>Your smart travel packing assistant</p>
+</header>
+
+<div class="container">
+
+<a href="index.html" class="back-link">
+    ← Back to Home
+</a>
+
+<!-- FORM -->
+
+<div class="box form-box">
+
+    <h2>Create Your Smart Packing List</h2>
+
+    <label for="destination">Destination</label>
+    <input
+        type="text"
+        id="destination"
+        placeholder="e.g. Dubai"
+    >
+
+    <label for="location">Location / Area</label>
+    <input
+        type="text"
+        id="location"
+        placeholder="e.g. Downtown Dubai"
+    >
+
+    <label for="days">Number of Days</label>
+    <input
+        type="number"
+        id="days"
+        min="1"
+        max="365"
+        placeholder="e.g. 5"
+    >
+
+    <label for="travelers">Number of Travelers</label>
+    <input
+        type="number"
+        id="travelers"
+        min="1"
+        max="50"
+        value="1"
+    >
+
+    <label for="gender">Travelers</label>
+    <select id="gender">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="mixed">Mixed Group</option>
+    </select>
+
+    <label for="tripType">Trip Type</label>
+    <select id="tripType">
+        <option value="beach">🏖 Beach Trip</option>
+        <option value="hiking">🥾 Hiking Trip</option>
+        <option value="international">✈️ International Trip</option>
+        <option value="city">🏙 City Trip</option>
+        <option value="business">💼 Business Trip</option>
+    </select>
+
+    <label for="weather">Expected Weather</label>
+    <select id="weather">
+        <option value="hot">☀️ Hot / Sunny</option>
+        <option value="cold">❄️ Cold</option>
+        <option value="rainy">🌧 Rainy</option>
+        <option value="mild">🌤 Mild / Comfortable</option>
+    </select>
+
+    <button class="generate-btn" onclick="generateList()">
+        Create My Packing List
+    </button>
+
+</div>
+
+
+<!-- RESULT -->
+
+<div class="box" id="result">
+
+    <h2 id="listTitle">
+        Your Packing List
+    </h2>
+
+    <div class="summary">
+
+        <div class="summary-card">
+            <small>Destination</small>
+            <strong id="summaryDestination">-</strong>
+        </div>
+
+        <div class="summary-card">
+            <small>Location</small>
+            <strong id="summaryLocation">-</strong>
+        </div>
+
+        <div class="summary-card">
+            <small>Duration</small>
+            <strong id="summaryDays">-</strong>
+        </div>
+
+        <div class="summary-card">
+            <small>Travelers</small>
+            <strong id="summaryTravelers">-</strong>
+        </div>
+
+    </div>
+
+    <div class="counter" id="counter">
+        0 / 0 packed
+    </div>
+
+    <div class="weather-box" id="weatherBox"></div>
+
+    <div class="reminder-box" id="reminderBox"></div>
+
+    <div id="packingCategories"></div>
+
+    <div class="action-buttons">
+
+        <button
+            class="print-btn"
+            onclick="window.print()"
+        >
+            🖨 Print List
+        </button>
+
+        <button
+            class="save-btn"
+            onclick="saveTrip()"
+        >
+            💾 Save Trip
+        </button>
+
+        <button
+            class="load-btn"
+            onclick="showSavedTrips()"
+        >
+            📂 Saved Trips
+        </button>
+
+        <button
+            class="clear-btn"
+            onclick="clearList()"
+        >
+            Clear List
+        </button>
+
+    </div>
+
+    <div class="saved-message" id="savedMessage">
+        ✓ Trip saved successfully.
+    </div>
+
+</div>
+
+
+<!-- SAVED TRIPS -->
+
+<div class="box saved-trips" id="savedTripsBox">
+
+    <h2>Saved Trips</h2>
+
+    <div id="savedTripsList">
+        <p class="no-saved">
+            No saved trips yet.
+        </p>
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let currentList = [];
+
+
+/* GENERATE */
+
+function generateList() {
+
+    const destination =
+        document.getElementById("destination").value.trim();
+
+    const location =
+        document.getElementById("location").value.trim();
+
+    const days =
+        parseInt(document.getElementById("days").value);
+
+    const travelers =
+        parseInt(document.getElementById("travelers").value);
+
+    const gender =
+        document.getElementById("gender").value;
+
+    const tripType =
+        document.getElementById("tripType").value;
+
+    const weather =
+        document.getElementById("weather").value;
+
+
+    if (!destination) {
+        alert("Please enter your destination.");
+        return;
+    }
+
+    if (!location) {
+        alert("Please enter your location / area.");
+        return;
+    }
+
+    if (isNaN(days) || days < 1) {
+        alert("Please enter a valid number of days.");
+        return;
+    }
+
+    if (isNaN(travelers) || travelers < 1) {
+        alert("Please enter the number of travelers.");
+        return;
+    }
+
+
+    const clothing = [];
+    const toiletries = [];
+    const electronics = [];
+    const documents = [];
+    const essentials = [];
+
+
+    /* CLOTHING */
+
+    clothing.push({
+        name: `T-shirts: ${days * travelers}`,
+        essential: false
+    });
+
+    clothing.push({
+        name: `Underwear: ${(days + 1) * travelers}`,
+        essential: true
+    });
+
+    clothing.push({
+        name: `Pairs of socks: ${(days + 1) * travelers}`,
+        essential: false
+    });
+
+    clothing.push({
+        name:
+            `Pants / trousers: ${
+                Math.max(1, Math.ceil(days / 2)) * travelers
+            }`,
+        essential: false
+    });
+
+    clothing.push({
+        name: `Sleepwear: ${travelers} set(s)`,
+        essential: false
+    });
+
+    clothing.push({
+        name: `Comfortable shoes: ${travelers} pair(s)`,
+        essential: true
+    });
+
+
+    /* GENDER */
+
+    if (gender === "female") {
+
+        clothing.push({
+            name: `Personal clothing / modesty items: ${travelers}`,
+            essential: false
+        });
+
+        toiletries.push({
+            name: "Personal care products",
+            essential: false
+        });
+    }
+
+    if (gender === "male") {
+
+        toiletries.push({
+            name: "Shaving / grooming supplies",
+            essential: false
+        });
+    }
+
+
+    /* TOILETRIES */
+
+    toiletries.push({
+        name: "Toothbrush and toothpaste",
+        essential: true
+    });
+
+    toiletries.push({
+        name: "Basic toiletries",
+        essential: false
+    });
+
+    toiletries.push({
+        name: "Deodorant",
+        essential: false
+    });
+
+    toiletries.push({
+        name: "Small first-aid kit",
+        essential: true
+    });
+
+
+    /* ELECTRONICS */
+
+    electronics.push({
+        name: `Phone and charger: ${travelers}`,
+        essential: true
+    });
+
+    electronics.push({
+        name: "Power bank",
+        essential: false
+    });
+
+
+    /* DOCUMENTS */
+
+    documents.push({
+        name: "Wallet / payment cards",
+        essential: true
+    });
+
+    documents.push({
+        name: "Identification",
+        essential: true
+    });
+
+
+    /* INTERNATIONAL */
+
+    if (tripType === "international") {
+
+        documents.push({
+            name: `Passport: ${travelers}`,
+            essential: true
+        });
+
+        documents.push({
+            name: "Visa / travel documents",
+            essential: true
+        });
+
+        documents.push({
+            name: "Flight tickets",
+            essential: true
+        });
+
+        documents.push({
+            name: "Travel insurance documents",
+            essential: false
+        });
+
+        electronics.push({
+            name: "Universal travel adapter",
+            essential: true
+        });
+    }
+
+
+    /* BEACH */
+
+    if (tripType === "beach") {
+
+        clothing.push({
+            name: `Swimwear: ${travelers * 2} sets`,
+            essential: true
+        });
+
+        essentials.push({
+            name: "Sunglasses",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Sunscreen",
+            essential: true
+        });
+
+        essentials.push({
+            name: "Beach towel",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Flip-flops",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Hat or cap",
+            essential: false
+        });
+    }
+
+
+    /* HIKING */
+
+    if (tripType === "hiking") {
+
+        clothing.push({
+            name: "Comfortable hiking clothes",
+            essential: true
+        });
+
+        clothing.push({
+            name: `Hiking shoes: ${travelers} pair(s)`,
+            essential: true
+        });
+
+        essentials.push({
+            name: `Backpack: ${travelers}`,
+            essential: true
+        });
+
+        essentials.push({
+            name: "Rain jacket",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Flashlight",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Extra water",
+            essential: true
+        });
+    }
+
+
+    /* CITY */
+
+    if (tripType === "city") {
+
+        essentials.push({
+            name: "Day bag",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Comfortable walking shoes",
+            essential: true
+        });
+    }
+
+
+    /* BUSINESS */
+
+    if (tripType === "business") {
+
+        clothing.push({
+            name: `Formal outfit(s): ${Math.max(1, Math.ceil(days / 2))}`,
+            essential: true
+        });
+
+        clothing.push({
+            name: "Formal shoes",
+            essential: true
+        });
+
+        essentials.push({
+            name: "Notebook and pen",
+            essential: false
+        });
+    }
+
+
+    /* WEATHER */
+
+    if (weather === "hot") {
+
+        clothing.push({
+            name: "Lightweight clothing",
+            essential: true
+        });
+
+        essentials.push({
+            name: "Sunscreen",
+            essential: true
+        });
+
+        essentials.push({
+            name: "Sunglasses",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Hat or cap",
+            essential: false
+        });
+    }
+
+
+    if (weather === "cold") {
+
+        clothing.push({
+            name: "Warm jacket",
+            essential: true
+        });
+
+        clothing.push({
+            name: "Warm sweater",
+            essential: true
+        });
+
+        clothing.push({
+            name: "Warm socks",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Gloves",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Scarf",
+            essential: false
+        });
+    }
+
+
+    if (weather === "rainy") {
+
+        essentials.push({
+            name: "Umbrella",
+            essential: true
+        });
+
+        essentials.push({
+            name: "Rain jacket",
+            essential: true
+        });
+
+        essentials.push({
+            name: "Water-resistant bag cover",
+            essential: false
+        });
+    }
+
+
+    if (weather === "mild") {
+
+        clothing.push({
+            name: "Light jacket",
+            essential: false
+        });
+
+        essentials.push({
+            name: "Reusable water bottle",
+            essential: false
+        });
+    }
+
+
+    currentList = [
+
+        {
+            title: "👕 Clothing",
+            items: clothing
+        },
+
+        {
+            title: "🧴 Toiletries",
+            items: toiletries
+        },
+
+        {
+            title: "📱 Electronics",
+            items: electronics
+        },
+
+        {
+            title: "📄 Documents",
+            items: documents
+        },
+
+        {
+            title: "🎒 Essentials",
+            items: essentials
+        }
+
+    ];
+
+
+    document.getElementById("listTitle").textContent =
+        `Packing List for ${destination}`;
+
+
+    document.getElementById("summaryDestination").textContent =
+        destination;
+
+    document.getElementById("summaryLocation").textContent =
+        location;
+
+    document.getElementById("summaryDays").textContent =
+        `${days} day(s)`;
+
+    document.getElementById("summaryTravelers").textContent =
+        `${travelers} traveler(s)`;
+
+
+    renderList();
+
+    showWeatherInfo(weather);
+
+    createReminders(destination, tripType);
+
+    document.getElementById("result").style.display = "block";
+
+    document.getElementById("savedMessage").style.display = "none";
+
+    updateCounter();
+}
+
+
+/* RENDER */
+
+function renderList() {
+
+    const container =
+        document.getElementById("packingCategories");
+
+    container.innerHTML = "";
+
+    let itemNumber = 0;
+
+
+    currentList.forEach(category => {
+
+        if (category.items.length === 0) {
+            return;
+        }
+
+        const categoryDiv =
+            document.createElement("div");
+
+        categoryDiv.className = "category";
+
+
+        const heading =
+            document.createElement("h3");
+
+        heading.textContent = category.title;
+
+
+        const ul =
+            document.createElement("ul");
+
+        ul.className = "packing-list";
+
+
+        category.items.forEach(item => {
+
+            itemNumber++;
+
+            const li =
+                document.createElement("li");
+
+            if (item.essential) {
+                li.classList.add("essential");
+            }
+
+
+            const label =
+                document.createElement("label");
+
+            const checkbox =
+                document.createElement("input");
+
+            checkbox.type = "checkbox";
+
+            checkbox.addEventListener(
+                "change",
+                updateCounter
+            );
+
+
+            const span =
+                document.createElement("span");
+
+            span.textContent = item.name;
+
+
+            if (item.essential) {
+
+                const badge =
+                    document.createElement("small");
+
+                badge.className =
+                    "essential-badge";
+
+                badge.textContent =
+                    "ESSENTIAL";
+
+                span.appendChild(badge);
+            }
+
+
+            label.appendChild(checkbox);
+
+            label.appendChild(span);
+
+            li.appendChild(label);
+
+            ul.appendChild(li);
+
+        });
+
+
+        categoryDiv.appendChild(heading);
+
+        categoryDiv.appendChild(ul);
+
+        container.appendChild(categoryDiv);
+
+    });
+}
+
+
+/* COUNTER */
+
+function updateCounter() {
+
+    const all =
+        document.querySelectorAll(
+            '.packing-list input[type="checkbox"]'
+        );
+
+    const checked =
+        document.querySelectorAll(
+            '.packing-list input[type="checkbox"]:checked'
+        );
+
+    document.getElementById("counter").textContent =
+        `${checked.length} / ${all.length} packed`;
+}
+
+
+/* WEATHER */
+
+function showWeatherInfo(weather) {
+
+    const box =
+        document.getElementById("weatherBox");
+
+    const messages = {
+
+        hot: [
+            "☀️ Hot Weather",
+            "Pack lightweight clothes, sun protection and enough water."
+        ],
+
+        cold: [
+            "❄️ Cold Weather",
+            "Warm layers, jacket and comfortable closed shoes are useful."
+        ],
+
+        rainy: [
+            "🌧 Rainy Weather",
+            "Keep rain protection handy and protect electronics from water."
+        ],
+
+        mild: [
+            "🌤 Mild Weather",
+            "Comfortable clothing with one light layer should work well."
+        ]
+    };
+
+    const info = messages[weather];
+
+    box.innerHTML = `
+        <h3>${info[0]}</h3>
+        <p>${info[1]}</p>
+    `;
+}
+
+
+/* REMINDERS */
+
+function createReminders(destination, tripType) {
+
+    const box =
+        document.getElementById("reminderBox");
+
+    const lower =
+        destination.toLowerCase();
+
+    let reminders = [];
+
+
+    if (tripType === "international") {
+
+        reminders.push(
+            "Check passport and travel document requirements before departure."
+        );
+
+        reminders.push(
+            "Keep important travel documents accessible."
+        );
+    }
+
+
+    if (
+        lower.includes("dubai") ||
+        lower.includes("uae")
+    ) {
+
+        reminders.push(
+            "Consider lightweight clothing and sun protection."
+        );
+    }
+
+
+    if (
+        lower.includes("murree") ||
+        lower.includes("naran") ||
+        lower.includes("hunza")
+    ) {
+
+        reminders.push(
+            "Mountain weather can change quickly."
+        );
+
+        reminders.push(
+            "Keep a warm layer and rain protection."
+        );
+    }
+
+
+    if (lower.includes("maldives")) {
+
+        reminders.push(
+            "Pack swimwear and sun protection."
+        );
+
+        reminders.push(
+            "Protect electronics from water and sand."
+        );
+    }
+
+
+    if (reminders.length === 0) {
+
+        reminders.push(
+            "Check the local weather before departure."
+        );
+
+        reminders.push(
+            "Keep important documents and valuables secure."
+        );
+    }
+
+
+    let html =
+        "<h3>📍 Travel Reminders</h3><ul>";
+
+
+    reminders.forEach(item => {
+
+        html += `<li>${item}</li>`;
+
+    });
+
+
+    html += "</ul>";
+
+    box.innerHTML = html;
+}
+
+
+/* SAVE TRIP */
+
+function saveTrip() {
+
+    if (currentList.length === 0) {
+
+        alert(
+            "Please create a packing list first."
+        );
+
+        return;
+    }
+
+
+    const trip = {
+
+        id: Date.now(),
+
+        destination:
+            document.getElementById("destination").value,
+
+        location:
+            document.getElementById("location").value,
+
+        days:
+            document.getElementById("days").value,
+
+        travelers:
+            document.getElementById("travelers").value,
+
+        gender:
+            document.getElementById("gender").value,
+
+        tripType:
+            document.getElementById("tripType").value,
+
+        weather:
+            document.getElementById("weather").value,
+
+        list:
+            currentList
+    };
+
+
+    let trips =
+        JSON.parse(
+            localStorage.getItem("packwiseTrips") || "[]"
+        );
+
+
+    trips.push(trip);
+
+
+    localStorage.setItem(
+        "packwiseTrips",
+        JSON.stringify(trips)
+    );
+
+
+    document.getElementById(
+        "savedMessage"
+    ).style.display = "block";
+
+
+    showSavedTrips();
+}
+
+
+/* SHOW SAVED TRIPS */
+
+function showSavedTrips() {
+
+    const box =
+        document.getElementById("savedTripsBox");
+
+    const list =
+        document.getElementById("savedTripsList");
+
+
+    let trips =
+        JSON.parse(
+            localStorage.getItem("packwiseTrips") || "[]"
+        );
+
+
+    box.style.display = "block";
+
+
+    if (trips.length === 0) {
+
+        list.innerHTML =
+            '<p class="no-saved">No saved trips yet.</p>';
+
+        return;
+    }
+
+
+    list.innerHTML = "";
+
+
+    trips.forEach(trip => {
+
+        const div =
+            document.createElement("div");
+
+        div.className = "saved-trip";
+
+
+        div.innerHTML = `
+
+            <div class="saved-trip-top">
+
+                <h4>
+                    ${escapeHTML(trip.destination)}
+                </h4>
+
+            </div>
+
+            <p>
+                ${escapeHTML(trip.location)}
+                · ${trip.days} day(s)
+                · ${trip.travelers} traveler(s)
+            </p>
+
+            <button
+                class="load-small"
+                onclick="loadTrip(${trip.id})"
+            >
+                Load
+            </button>
+
+            <button
+                class="delete-small"
+                onclick="deleteTrip(${trip.id})"
+            >
+                Delete
+            </button>
+        `;
+
+
+        list.appendChild(div);
+
+    });
+}
+
+
+/* LOAD TRIP */
+
+function loadTrip(id) {
+
+    let trips =
+        JSON.parse(
+            localStorage.getItem("packwiseTrips") || "[]"
+        );
+
+
+    const trip =
+        trips.find(item => item.id === id);
+
+
+    if (!trip) {
+
+        alert("Saved trip not found.");
+
+        return;
+    }
+
+
+    document.getElementById("destination").value =
+        trip.destination;
+
+    document.getElementById("location").value =
+        trip.location;
+
+    document.getElementById("days").value =
+        trip.days;
+
+    document.getElementById("travelers").value =
+        trip.travelers;
+
+    document.getElementById("gender").value =
+        trip.gender;
+
+    document.getElementById("tripType").value =
+        trip.tripType;
+
+    document.getElementById("weather").value =
+        trip.weather;
+
+
+    currentList = trip.list;
+
+
+    document.getElementById("listTitle").textContent =
+        `Packing List for ${trip.destination}`;
+
+
+    document.getElementById("summaryDestination").textContent =
+        trip.destination;
+
+    document.getElementById("summaryLocation").textContent =
+        trip.location;
+
+    document.getElementById("summaryDays").textContent =
+        `${trip.days} day(s)`;
+
+    document.getElementById("summaryTravelers").textContent =
+        `${trip.travelers} traveler(s)`;
+
+
+    renderList();
+
+    showWeatherInfo(trip.weather);
+
+    createReminders(
+        trip.destination,
+        trip.tripType
+    );
+
+
+    document.getElementById("result").style.display =
+        "block";
+
+
+    updateCounter();
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+/* DELETE TRIP */
+
+function deleteTrip(id) {
+
+    let trips =
+        JSON.parse(
+            localStorage.getItem("packwiseTrips") || "[]"
+        );
+
+
+    trips =
+        trips.filter(
+            trip => trip.id !== id
+        );
+
+
+    localStorage.setItem(
+        "packwiseTrips",
+        JSON.stringify(trips)
+    );
+
+
+    showSavedTrips();
+}
+
+
+/* CLEAR */
+
+function clearList() {
+
+    currentList = [];
+
+
+    document.getElementById(
+        "packingCategories"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+        "weatherBox"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+        "reminderBox"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+        "result"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "counter"
+    ).textContent =
+        "0 / 0 packed";
+
+
+    document.getElementById(
+        "savedMessage"
+    ).style.display =
+        "none";
+}
+
+
+/* SECURITY HELPER */
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+
+
+/* LOAD SAVED TRIPS ON START */
+
+showSavedTrips();
+
+</script>
+
+</body>
+</html>
