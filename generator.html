@@ -134,6 +134,25 @@
             line-height: 1.5;
         }
 
+        .weather-auto-info {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+        }
+
+        .weather-auto-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .weather-auto-info p {
+            margin: 0;
+            color: #666;
+            line-height: 1.5;
+        }
+
         .reminder-box {
             margin-top: 15px;
             padding: 18px;
@@ -469,29 +488,12 @@
 
         <!-- WEATHER -->
 
-        <label for="weather">
-            Expected Weather
-        </label>
-
-        <select id="weather">
-
-            <option value="hot">
-                Hot / Sunny
-            </option>
-
-            <option value="cold">
-                Cold
-            </option>
-
-            <option value="rainy">
-                Rainy
-            </option>
-
-            <option value="mild">
-                Mild / Comfortable
-            </option>
-
-        </select>
+        <div class="weather-auto-info">
+            <strong>Weather</strong>
+            <p id="weatherStatus">
+                PackWise will check the current weather for your destination automatically.
+            </p>
+        </div>
 
 
         <button
@@ -595,10 +597,12 @@
 
 let currentList = [];
 
+let currentWeatherCategory = "mild";
+
 
 /* GENERATE LIST */
 
-function generateList() {
+async function generateList() {
 
     const homeLocation =
         document.getElementById("homeLocation")
@@ -625,9 +629,6 @@ function generateList() {
 
     const tripType =
         document.getElementById("tripType").value;
-
-    const weather =
-        document.getElementById("weather").value;
 
 
     if (homeLocation === "") {
@@ -671,6 +672,92 @@ function generateList() {
 
         return;
     }
+
+
+    /*
+       Replace this with your actual Cloudflare Worker URL.
+       Example:
+       https://packwise-weather-xxxxx.workers.dev
+    */
+    const WEATHER_API_URL =
+        "YOUR_CLOUDFLARE_WORKER_URL";
+
+    const generateButton =
+        document.querySelector(".generate-btn");
+
+    const weatherStatus =
+        document.getElementById("weatherStatus");
+
+    generateButton.disabled = true;
+    generateButton.textContent =
+        "Checking weather...";
+
+    weatherStatus.textContent =
+        `Checking current weather in ${destination}...`;
+
+    let weatherData = null;
+
+    try {
+
+        const response =
+            await fetch(
+                `${WEATHER_API_URL}/weather?city=${encodeURIComponent(destination)}`
+            );
+
+        let data = null;
+
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = null;
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                data && data.error
+                    ? data.error
+                    : "Could not get weather information."
+            );
+        }
+
+        if (
+            !data ||
+            typeof data.temperature !== "number" ||
+            !data.weather
+        ) {
+            throw new Error(
+                "Weather information was incomplete."
+            );
+        }
+
+        weatherData = data;
+
+    } catch (error) {
+
+        console.error(
+            "Weather request failed:",
+            error
+        );
+
+        weatherStatus.textContent =
+            "Weather could not be checked right now. Please try again.";
+
+        alert(
+            "We could not get the current weather for this destination. Please check the destination name and try again."
+        );
+
+        generateButton.disabled = false;
+        generateButton.textContent =
+            "Create My Packing List";
+
+        return;
+    }
+
+    const weather =
+        getWeatherCategory(weatherData);
+
+    currentWeatherCategory =
+        weather;
 
 
     const clothing = [];
@@ -1159,11 +1246,15 @@ function generateList() {
         "none";
 
 
-    showWeatherInfo(weather);
+    showWeatherInfo(weatherData, weather);
 
     showTripSummary();
 
     updateCounter();
+
+    generateButton.disabled = false;
+    generateButton.textContent =
+        "Create My Packing List";
 }
 
 
@@ -1242,59 +1333,153 @@ function showTripSummary() {
 }
 
 
+/* WEATHER CATEGORY */
+
+function getWeatherCategory(weatherData) {
+
+    const temperature =
+        weatherData.temperature;
+
+    const main =
+        String(
+            weatherData.weather || ""
+        ).toLowerCase();
+
+    if (
+        main.includes("rain") ||
+        main.includes("drizzle") ||
+        main.includes("thunderstorm")
+    ) {
+        return "rainy";
+    }
+
+    if (temperature >= 28) {
+        return "hot";
+    }
+
+    if (temperature <= 15) {
+        return "cold";
+    }
+
+    return "mild";
+}
+
+
 /* WEATHER INFO */
 
-function showWeatherInfo(weather) {
+function showWeatherInfo(
+    weatherData,
+    weatherCategory
+) {
 
     const weatherBox =
         document.getElementById(
             "weatherBox"
         );
 
+    const temperature =
+        Math.round(
+            weatherData.temperature
+        );
 
-    const messages = {
+    const feelsLike =
+        Math.round(
+            weatherData.feelsLike
+        );
 
-        hot: {
-            title: "Hot Weather",
-            text:
-                "Pack lightweight clothing, sun protection and stay hydrated."
-        },
+    const description =
+        weatherData.description ||
+        "Current conditions";
 
-        cold: {
-            title: "Cold Weather",
-            text:
-                "Warm layers, jackets and comfortable closed shoes are recommended."
-        },
+    const humidity =
+        weatherData.humidity;
 
-        rainy: {
-            title: "Rainy Weather",
-            text:
-                "Keep rain protection handy and protect electronics from water."
-        },
+    const windSpeed =
+        weatherData.windSpeed;
 
-        mild: {
-            title: "Mild Weather",
-            text:
-                "Comfortable clothing with one light layer should work well."
-        }
+    const categoryTitles = {
+
+        hot: "Hot Weather",
+
+        cold: "Cold Weather",
+
+        rainy: "Rainy Weather",
+
+        mild: "Mild Weather"
 
     };
 
+    const packingAdvice = {
 
-    const info =
-        messages[weather];
+        hot:
+            "Pack lightweight clothing, sun protection and stay hydrated.",
+
+        cold:
+            "Warm layers, a jacket and comfortable closed shoes are recommended.",
+
+        rainy:
+            "Keep rain protection handy and protect electronics from water.",
+
+        mild:
+            "Comfortable clothing with one light layer should work well."
+
+    };
+
+    const location =
+        weatherData.country
+            ? `${weatherData.city}, ${weatherData.country}`
+            : weatherData.city;
 
 
     weatherBox.innerHTML = `
 
-        <h3>${info.title}</h3>
+        <h3>
+            ${categoryTitles[weatherCategory]}
+        </h3>
 
         <p>
-            ${info.text}
+            <strong>${location}</strong>
+        </p>
+
+        <p>
+            Current temperature:
+            <strong>${temperature}°C</strong>
+            · Feels like:
+            <strong>${feelsLike}°C</strong>
+        </p>
+
+        <p>
+            Conditions:
+            ${description}
+        </p>
+
+        <p>
+            Humidity:
+            ${humidity}%
+            · Wind:
+            ${windSpeed} m/s
+        </p>
+
+        <p>
+            ${packingAdvice[weatherCategory]}
         </p>
 
     `;
+
+    const weatherStatus =
+        document.getElementById(
+            "weatherStatus"
+        );
+
+    weatherStatus.textContent =
+        `Current weather found for ${location}: ${temperature}°C and ${description}.`;
 }
+
+
+/* 
+   The weather category is used by the packing-list rules:
+   hot, cold, rainy or mild.
+*/
 
 
 /* DESTINATION REMINDERS */
@@ -1662,9 +1847,7 @@ function saveList() {
             ).value,
 
         weather:
-            document.getElementById(
-                "weather"
-            ).value,
+            currentWeatherCategory,
 
         list:
             currentList,
@@ -1783,12 +1966,6 @@ function loadSelectedTrip() {
             trip.tripType || "international";
 
 
-        document.getElementById(
-            "weather"
-        ).value =
-            trip.weather || "mild";
-
-
         currentList =
             trip.list || [];
 
@@ -1810,9 +1987,34 @@ function loadSelectedTrip() {
             "block";
 
 
+        const savedWeatherCategory =
+            trip.weather || "mild";
+
+        currentWeatherCategory =
+            savedWeatherCategory;
+
         showWeatherInfo(
-            trip.weather || "mild"
+            {
+                city:
+                    trip.destination ||
+                    "Saved destination",
+                country: "",
+                temperature: 0,
+                feelsLike: 0,
+                humidity: 0,
+                weather:
+                    savedWeatherCategory,
+                description:
+                    "Saved weather category",
+                windSpeed: 0
+            },
+            savedWeatherCategory
         );
+
+        document.getElementById(
+            "weatherStatus"
+        ).textContent =
+            "This trip was saved with its previous weather category. Create a new list to check current weather.";
 
 
         createDestinationReminders(
@@ -1846,6 +2048,8 @@ function loadSelectedTrip() {
 function clearList() {
 
     currentList = [];
+
+    currentWeatherCategory = "mild";
 
 
     document.getElementById(
